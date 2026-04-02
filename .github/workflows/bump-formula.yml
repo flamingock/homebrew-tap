@@ -1,0 +1,64 @@
+name: Bump Formula
+
+# Triggered automatically by the flamingock-cli release workflow via `gh workflow run`.
+# Can also be triggered manually from the Actions tab.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to bump to (e.g. 1.0.2). No 'v' prefix."
+        required: true
+        type: string
+      sha256_linux:
+        description: "SHA256 of the linux-x86_64 binary"
+        required: true
+        type: string
+      sha256_macos:
+        description: "SHA256 of the macos-arm64 binary"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  bump:
+    name: Bump flamingock-cli to ${{ github.event.inputs.version }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout tap
+        uses: actions/checkout@v4
+
+      - name: Update formula
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          SHA_LINUX="${{ github.event.inputs.sha256_linux }}"
+          SHA_MACOS="${{ github.event.inputs.sha256_macos }}"
+
+          sed -i "s|version \".*\"|version \"${VERSION}\"|g" Formula/flamingock.rb
+          # Replace sha256 on the line immediately after each url line
+          sed -i "/flamingock-.*-macos-arm64\"/{n; s|sha256 \".*\"|sha256 \"${SHA_MACOS}\"|}g" Formula/flamingock.rb
+          sed -i "/flamingock-.*-linux-x86_64\"/{n; s|sha256 \".*\"|sha256 \"${SHA_LINUX}\"|}g" Formula/flamingock.rb
+
+          echo "=== Updated Formula/flamingock.rb ==="
+          cat Formula/flamingock.rb
+
+      - name: Commit and push
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add Formula/flamingock.rb
+          git diff --cached --stat
+
+          if git diff --cached --quiet; then
+            echo "Formula already at version ${VERSION}, nothing to commit."
+            exit 0
+          fi
+
+          git commit -m "feat: bump flamingock-cli to ${VERSION}"
+          git push origin master
+          echo "Formula bumped to ${VERSION}"
