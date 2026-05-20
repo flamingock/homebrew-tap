@@ -8,7 +8,7 @@
 class Flamingock < Formula
   desc "CLI tool for executing Flamingock change operations outside the application lifecycle"
   homepage "https://flamingock.io"
-  version "1.1.0-beta.2"
+  version "1.1.0"
   license "Apache-2.0"
 
   # ── Platform-specific pre-built binaries ─────────────────────────────────────
@@ -18,7 +18,7 @@ class Flamingock < Formula
   on_macos do
     if Hardware::CPU.arm?
       url "https://github.com/flamingock/flamingock-cli/releases/download/v#{version}/flamingock-#{version}-macos-arm64"
-      sha256 "76ae536989f97acf2d1d7517c3dbe8010f8b17ccfb4f41c42ee2fa1db4f068a9"
+      sha256 "4af5de2fb3400cc770a4d39c61440fc0608d53ec04f273ed1cf7755ef04f96a4"
     else
       # Intel macOS is not currently supported. Build from source or use the JVM JAR:
       #   java -jar https://github.com/flamingock/flamingock-cli/releases/download/v<VERSION>/flamingock-cli-<VERSION>.jar
@@ -29,7 +29,7 @@ class Flamingock < Formula
   on_linux do
     if Hardware::CPU.intel?
       url "https://github.com/flamingock/flamingock-cli/releases/download/v#{version}/flamingock-#{version}-linux-x86_64"
-      sha256 "8c41215620c68a9bef9ffb113a56b8e450c761a8e9230c39b3451c0af5cab56a"
+      sha256 "fc3bf225e742b94b7ea9dde04270bf8052d54f739bd4dca8f551a4362ec01f56"
     else
       odie "Linux ARM is not yet supported by this formula."
     end
